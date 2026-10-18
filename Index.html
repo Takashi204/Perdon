@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Una carta para ti</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fde8e4; --bg2:#fbd3d6; --ink:#5b3a4a; --rose:#e8788a; --paper:#fffaf1; --env:#f4b6bf; --env-d:#e99aa8; --line:#f0d9d0;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#2a1b27; --bg2:#3a2132; --ink:#f6e3e6; --rose:#f08fa0; --paper:#fff4e6; --env:#c9677d; --env-d:#a94d65; --line:#ead7c8}
+}
+:root[data-theme="dark"]{--bg:#2a1b27; --bg2:#3a2132; --ink:#f6e3e6; --rose:#f08fa0; --paper:#fff4e6; --env:#c9677d; --env-d:#a94d65; --line:#ead7c8}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--ink);font-family:"Fredoka",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px 16px 40px;overflow-x:hidden}
+h1{font-weight:600;font-size:clamp(1.5rem,6vw,2.1rem);margin:0;text-align:center}
+.hint{margin:0;font-size:1rem;opacity:.8;text-align:center;transition:opacity .4s}
+.bear{width:min(220px,58vw);height:auto;animation:bob 3.2s ease-in-out infinite;overflow:visible}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.blink{transform-origin:100px 100px;animation:blink 4s infinite}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.tear{animation:tear 2.4s ease-in infinite;opacity:0}
+.tear.b{animation-delay:1.1s}
+@keyframes tear{0%{opacity:0;transform:translateY(0)}15%{opacity:.9}100%{opacity:0;transform:translateY(34px)}}
+.flower{transform-origin:150px 190px;animation:sway 2.6s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(7deg)}}
+
+.stage{display:grid;width:min(360px,92vw);margin-top:6px}
+.stage>*{grid-area:1/1}
+.envelope{position:relative;height:220px;width:100%;border:0;background:none;padding:0;cursor:pointer;perspective:900px;transition:opacity .5s .5s,transform .5s .5s;font:inherit}
+.envelope:focus-visible{outline:3px solid var(--rose);outline-offset:6px;border-radius:12px}
+.env-back{position:absolute;inset:40px 0 0;background:var(--env-d);border-radius:8px}
+.env-letter{position:absolute;left:8%;width:84%;bottom:14px;height:150px;background:var(--paper);border-radius:6px;transition:transform .8s ease .45s;box-shadow:0 2px 6px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-size:2rem}
+.env-front{position:absolute;inset:40px 0 0;border-radius:8px;background:
+  linear-gradient(to top right,transparent 49.5%,var(--env) 50%) left/50% 100% no-repeat,
+  linear-gradient(to top left,transparent 49.5%,var(--env) 50%) right/50% 100% no-repeat;filter:drop-shadow(0 4px 6px rgba(0,0,0,.15))}
+.env-front::after{content:"";position:absolute;inset:0;border-radius:8px;background:var(--env);clip-path:polygon(0 100%,100% 100%,100% 40%,50% 78%,0 40%);opacity:.0}
+.env-bottom{position:absolute;inset:40px 0 0;border-radius:8px;background:var(--env);clip-path:polygon(0 100%,100% 100%,100% 38%,50% 74%,0 38%);filter:drop-shadow(0 -1px 0 rgba(0,0,0,.05))}
+.flap{position:absolute;top:40px;left:0;right:0;height:92px;background:var(--env-d);clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .7s ease,z-index 0s .35s;z-index:4;border-radius:8px 8px 0 0}
+.seal{position:absolute;top:100px;left:50%;translate:-50% 0;z-index:5;font-size:2rem;transition:opacity .3s;animation:beat 1.4s ease-in-out infinite}
+@keyframes beat{50%{scale:1.18}}
+.stage.open .flap{transform:rotateX(180deg);z-index:1}
+.stage.open .seal{opacity:0;animation:none}
+.stage.open .env-letter{transform:translateY(-60px)}
+.stage.read .envelope{opacity:0;transform:scale(.9) translateY(20px);pointer-events:none}
+
+.card{background:var(--paper);color:#5b3a4a;border-radius:10px;padding:26px 24px 22px;box-shadow:0 10px 30px rgba(91,58,74,.25);transform-origin:top;transform:scaleY(0);opacity:0;pointer-events:none;transition:transform .7s cubic-bezier(.2,.9,.3,1.1),opacity .3s;align-self:start;
+  background-image:repeating-linear-gradient(transparent,transparent 31px,var(--line) 32px)}
+.stage.read .card{transform:scaleY(1);opacity:1;pointer-events:auto;transition-delay:.5s}
+.card h2{font-family:"Caveat",cursive;font-size:2.2rem;margin:0 0 8px;line-height:1.1;color:#d4586f}
+.card p{font-family:"Caveat",cursive;font-weight:500;font-size:1.45rem;line-height:32px;margin:0 0 10px}
+.card .sign{text-align:right;font-weight:700;font-size:1.7rem;margin:6px 0 0}
+.again{margin-top:14px;font:inherit;font-size:.95rem;background:var(--rose);color:#fff;border:0;border-radius:99px;padding:8px 18px;cursor:pointer}
+.again:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.heart{position:fixed;bottom:-30px;pointer-events:none;animation:rise linear forwards;z-index:10}
+@keyframes rise{to{transform:translateY(-110vh) rotate(25deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important;transition-delay:0s!important}}
+</style>
+</head>
+<body>
+
+<h1>Tengo algo que decirte, <span class="nombre">mi amor</span></h1>
+
+<svg class="bear" viewBox="0 0 200 215" role="img" aria-label="Un osito triste con una flor">
+  <circle cx="52" cy="52" r="24" fill="#c98b5e"/><circle cx="52" cy="52" r="13" fill="#f4b6bf"/>
+  <circle cx="148" cy="52" r="24" fill="#c98b5e"/><circle cx="148" cy="52" r="13" fill="#f4b6bf"/>
+  <ellipse cx="100" cy="190" rx="52" ry="26" fill="#c98b5e"/>
+  <ellipse cx="100" cy="105" rx="68" ry="60" fill="#c98b5e"/>
+  <ellipse cx="100" cy="124" rx="27" ry="20" fill="#f3d3b0"/>
+  <ellipse cx="100" cy="115" rx="8" ry="6" fill="#4a2a38"/>
+  <path d="M89 135 Q100 126 111 135" fill="none" stroke="#4a2a38" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="62" cy="122" r="9" fill="#f08fa0" opacity=".55"/><circle cx="138" cy="122" r="9" fill="#f08fa0" opacity=".55"/>
+  <g class="blink">
+    <ellipse cx="76" cy="101" rx="7" ry="9" fill="#3a2430"/><circle cx="78.5" cy="97" r="2.6" fill="#fff"/>
+    <ellipse cx="124" cy="101" rx="7" ry="9" fill="#3a2430"/><circle cx="126.5" cy="97" r="2.6" fill="#fff"/>
+  </g>
+  <path d="M62 86 L87 91 M138 86 L113 91" stroke="#4a2a38" stroke-width="3.5" stroke-linecap="round"/>
+  <path class="tear" d="M70 112 q-5 9 0 12 q5 -3 0 -12z" fill="#8ed0f2"/>
+  <path class="tear b" d="M130 112 q-5 9 0 12 q5 -3 0 -12z" fill="#8ed0f2"/>
+  <g class="flower">
+    <path d="M150 196 L150 150" stroke="#6bb26b" stroke-width="5" stroke-linecap="round"/>
+    <path d="M150 178 q14 -4 18 -14 q-14 0 -18 14z" fill="#6bb26b"/>
+    <g fill="#f08fa0"><circle cx="150" cy="130" r="9"/><circle cx="161" cy="139" r="9"/><circle cx="139" cy="139" r="9"/><circle cx="156" cy="150" r="9"/><circle cx="144" cy="150" r="9"/></g>
+    <circle cx="150" cy="141" r="7" fill="#ffd966"/>
+  </g>
+  <circle cx="138" cy="190" r="12" fill="#b57a50"/><circle cx="162" cy="190" r="12" fill="#b57a50"/>
+</svg>
+
+<p class="hint" id="hint">Toca el sobre para abrirlo</p>
+
+<div class="stage" id="stage">
+  <button class="envelope" id="env" aria-label="Abrir la carta">
+    <div class="env-back"></div>
+    <div class="env-letter" aria-hidden="true">💌</div>
+    <div class="env-bottom"></div>
+    <div class="flap"></div>
+    <div class="seal" aria-hidden="true">❤️</div>
+  </button>
+
+  <article class="card" id="card" aria-live="polite">
+    <h2>Para <span class="nombre">mi amor</span>,</h2>
+    <p>Quiero empezar diciéndote perdóname. Sé que soy un tonto y no hay excusa que valga para mi manera de ser</p>
+    <p>Me quedé pensando en lo que pasó, y lo que más me duele es haber hecho que dudaras de lo mucho que te quiero.</p>
+    <p>ser más paciente y cuidar tu corazón como mereces. Tú eres lo más bonito que tengo.</p>
+    <p>Gracias por todo lo que me das, incluso cuando no lo merezco. ¿Le das otra oportunidad a este tonto?</p>
+    <p class="sign">Con todo mi amor,<br><span class="firma">tu osito</span> 🧸</p>
+    <button class="again" id="again">Guardar la carta</button>
+  </article>
+</div>
+
+<script>
+// Cambia estos dos textos por los de ustedes
+var NOMBRE = "mi amor";
+var FIRMA  = "tu osito";
+
+document.querySelectorAll(".nombre").forEach(function(e){e.textContent = NOMBRE});
+document.querySelectorAll(".firma").forEach(function(e){e.textContent = FIRMA});
+
+var stage = document.getElementById("stage"), hint = document.getElementById("hint");
+
+function hearts(){
+  var set = ["❤️","💗","💕","🌸","💖"];
+  for(var i=0;i<16;i++){
+    var h = document.createElement("span");
+    h.className = "heart";
+    h.textContent = set[i % set.length];
+    h.style.left = Math.random()*95 + "vw";
+    h.style.fontSize = (18 + Math.random()*22) + "px";
+    h.style.animationDuration = (3 + Math.random()*3) + "s";
+    h.style.animationDelay = (Math.random()*1.2) + "s";
+    document.body.appendChild(h);
+    setTimeout(function(el){el.remove()}, 7500, h);
+  }
+}
+
+document.getElementById("env").addEventListener("click", function(){
+  stage.classList.add("open");
+  hint.style.opacity = 0;
+  setTimeout(function(){ stage.classList.add("read"); hearts(); }, 1300);
+});
+document.getElementById("again").addEventListener("click", function(){
+  stage.classList.remove("read","open");
+  hint.style.opacity = .8;
+});
+</script>
+</body>
+</html>
